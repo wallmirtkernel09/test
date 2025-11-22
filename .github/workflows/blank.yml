@@ -1,4 +1,4 @@
-name: Build and Release TGZ
+name: Build and Release ZIP (Split 5GB)
 
 on:
   workflow_dispatch:
@@ -18,13 +18,21 @@ jobs:
         run: |
           git clone -b ruby-s-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel-source
 
-      - name: Compress ke TGZ
-        run: |
-          tar -czvf xiaomi_kernel_ruby-s-oss.tgz kernel-source
+      - name: Install zip (jika belum ada)
+        run: sudo apt-get update && sudo apt-get install -y zip
 
-      - name: Upload ke Release
+      - name: Compress dan Split ZIP (5GB per part)
+        run: |
+          zip -s 5g kernel_ruby-s-oss.zip -r kernel-source
+
+      - name: List hasil split
+        run: ls -lh
+
+      - name: Upload semua part ke Release
         uses: softprops/action-gh-release@v2
         with:
-          files: xiaomi_kernel_ruby-s-oss.tgz
+          files: |
+            kernel_ruby-s-oss.zip
+            kernel_ruby-s-oss.z*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
